@@ -1,0 +1,310 @@
+{
+  "name": "Bakehous by Rumaisa",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2d5a6709-09f6-4954-aa51-39e262faaa93",
+      "name": "When chat message received",
+      "webhookId": "9eb16f61-bde0-4c1e-9e4d-98da1bcb845a"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a smart food ordering assistant for \"Bakehouse by Rumaisa\", a bakery that sells cakes, pastries, cupcakes, donuts, patties, sandwiches, and custom cakes.\n\nYou have access to THREE Google Sheets:\n1. Inventory Sheet → Food items with available quantity and status.\n2. Orders Sheet → Customer orders with status (Confirmed/Rejected).\n3. FAQs Sheet → Common questions and answers.\n\n---\n\n### 🟢 RULES:\n\n1. **FIRST MESSAGE** from user (hi/hello):\n   Reply:\n   \"Welcome to Bakehouse by Rumaisa! 🧁\n   How can I help you today?\n   - Place an order\n   - FAQ / Information\n   - Check order / stock\"\n\n2. **PLACE ORDER**:\n   - Ask step-by-step: Customer Name, Food Item, Quantity.\n   - Check Inventory Sheet before confirming.\n   - If item available → Confirm order.\n   - If not available → Reject order and suggest available items.\n   - Only confirmed orders go into Orders Sheet.\n   - In Orders Sheet always include:\n     - Status = Confirmed / Rejected\n     - Description = \"Order accepted (item available)\" OR \"Order rejected (out of stock)\"\n\n3. **FAQ**:\n   - Check FAQs Sheet.\n   - Answer short, clear, friendly.\n   - If not found, say: \"Sorry, I don't have that information right now.\"\n\n4. **CHECK ORDER / STOCK**:\n   - Ask for food name or order ID.\n   - Check Orders Sheet for status.\n   - Check Inventory Sheet for stock.\n   - If \"check stock\" → reply with available quantity.\n   - Also list all available items if requested.\n\n5. **CANCEL ORDER**:\n   - Reply politely:\n     \"Sorry 😔 I cannot cancel orders directly.\n     Please call the restaurant owner first and inform them.\n     Owner Contact: +95 1224567890\"\n\n---\n\n### 🗣️ TONE & FORMAT:\n- Reply like a normal WhatsApp message.\n- DO NOT use **bold** or long paragraphs.\n- Use *strikethrough* only for highlighting (if needed).\n- Keep tone friendly, polite, like a food delivery app.\n- Always use short, clear sentences.\n\n---\n\n### 📦 INVENTORY SHEET (Reference):\nFood items available:\n- Chocolate Cake (6)\n- Black Forest Cake (5)\n- Red Velvet Cake (4)\n- Pineapple Pastry (12)\n- Chocolate Pastry (10)\n- Fresh Cream Cupcakes (15)\n- Chocolate Donuts (8)\n- Butter Croissants (7)\n- Chicken Patties (10)\n- Veg Patties (9)\n- Garlic Bread (6)\n- Cheese Sandwich (5)\n- Brownies (11)\n- Chocolate Muffins (14)\n- Custom Birthday Cake (2)\n\n---\n\n### 📋 FAQ SHEET (Examples):\n- Opening hours: 9:00 AM to 10:00 PM daily\n- Home delivery: Yes, within 5 km\n- Custom cakes: Yes, 24 hours notice required\n- Payments: UPI, card, cash on delivery\n- Eggless options: Yes available\n- Same-day delivery: Yes for selected items\n\n---\n\n### ❗ IMPORTANT:\n- Always check inventory before confirming order.\n- Only confirmed orders go to Orders Sheet.\n- Keep responses short and friendly."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9142235a-9c51-448c-9dd9-23234f7c112d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "93dfa7ba-bdfb-442f-a010-c0852c8c8d9d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8wZPjjaXErppkidB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "11178210-99c5-4292-8daf-d9c1c25f64bb",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NJDS8t3EvYqkRPf1bgijdUvmRMK70_8l1c0NCyaMqqY",
+          "mode": "list",
+          "cachedResultName": "Bakehouse by Rumaisa",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NJDS8t3EvYqkRPf1bgijdUvmRMK70_8l1c0NCyaMqqY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NJDS8t3EvYqkRPf1bgijdUvmRMK70_8l1c0NCyaMqqY/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        208
+      ],
+      "id": "0c8e6f85-653c-43ea-85e8-3cf800068403",
+      "name": "Get Inventory",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2e4komXkQymxud0i",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NJDS8t3EvYqkRPf1bgijdUvmRMK70_8l1c0NCyaMqqY",
+          "mode": "list",
+          "cachedResultName": "Bakehouse by Rumaisa",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NJDS8t3EvYqkRPf1bgijdUvmRMK70_8l1c0NCyaMqqY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1532218845,
+          "mode": "list",
+          "cachedResultName": "FAQs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NJDS8t3EvYqkRPf1bgijdUvmRMK70_8l1c0NCyaMqqY/edit#gid=1532218845"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        208
+      ],
+      "id": "201228f0-8738-45ed-bbca-34c4c02b0029",
+      "name": "Get FAQs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2e4komXkQymxud0i",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NJDS8t3EvYqkRPf1bgijdUvmRMK70_8l1c0NCyaMqqY",
+          "mode": "list",
+          "cachedResultName": "Bakehouse by Rumaisa",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NJDS8t3EvYqkRPf1bgijdUvmRMK70_8l1c0NCyaMqqY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1116330805,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NJDS8t3EvYqkRPf1bgijdUvmRMK70_8l1c0NCyaMqqY/edit#gid=1116330805"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Costumer Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Costumer_Name', ``, 'string') }}",
+            "Food Item": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Food_Item', ``, 'string') }}",
+            "Quantity Ordered": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity_Ordered', ``, 'string') }}",
+            "Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Status', ``, 'string') }}",
+            "Order Date": "={{ $now.format('yyyy-MM-dd HH-mm-ss a') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Costumer Name",
+              "displayName": "Costumer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Food Item",
+              "displayName": "Food Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity Ordered",
+              "displayName": "Quantity Ordered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        208
+      ],
+      "id": "3e180c89-d137-4fb1-8f01-aa52d1041888",
+      "name": "Get Orders",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2e4komXkQymxud0i",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Inventory": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FAQs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Orders": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "33d3bff8-cd2b-4e84-8e84-2e5cce382828",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bb4333866933bd14caf240b77d48542c229017629c70da2398d0b8e44c0b544"
+  },
+  "id": "hEClXHYnzHitxmKO",
+  "tags": []
+}
